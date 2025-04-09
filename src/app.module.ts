@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
@@ -9,6 +9,7 @@ import { TestController } from "./routes/test/test.controller";
 import { TestModule } from "./routes/test/test.module";
 import { TasksService } from "./routes/tasks/tasks.service";
 import { SharedModule } from "./shared/shared.module";
+import { RateLimitMiddleware } from "./middleware/ratelimit.middleware";
 
 @Module({
   imports: [
@@ -25,4 +26,9 @@ import { SharedModule } from "./shared/shared.module";
   exports: [SharedModule],
   controllers: [AppController, TestController],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RateLimitMiddleware)
+    .forRoutes("/")
+  }
+}

@@ -5,10 +5,10 @@ import { Logger } from "./shared/services/logger.service";
 import { globalSettings } from "./config/settings.config";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 import { HttpExceptionFilter } from "./catch/globalErrorCatcher";
+import { RateLimitMiddleware } from "./middleware/ratelimit.middleware";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
   // Enable global exception filter
   app.useGlobalFilters(new HttpExceptionFilter(new Logger()));
 

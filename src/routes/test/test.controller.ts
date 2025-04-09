@@ -12,7 +12,7 @@ export class TestController {
   
 @Get("/")
 async getTestMail(req: Request) {
-
+  return "Hello World";
 }
 
 }

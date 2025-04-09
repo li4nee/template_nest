@@ -15,7 +15,14 @@ export const globalSettings = {
     PASSWORD: process.env.DB_PASSWORD || "new_password",
     DATABASE: process.env.DB_DATABASE || "selfhosteasy",
   },
-
+  RATE_LIMIT:{
+    REQUEST_LIMIT: Number(process.env.REQUEST_LIMIT) || 100,
+    TIME_LIMIT: Number(process.env.TIME_LIMIT) || 100,
+    BLOCK_DURATION: Number(process.env.BLOCK_DURATION) || 100,
+    WHITELIST: process.env.WHITELIST ? process.env.WHITELIST.split(",") : [],
+    MAX_RATE_LIMIT_OFFEND: Number(process.env.MAX_RATE_LIMIT_OFFEND) || 5, // if more than offend for 5 times 1 day block
+    MAX_RATE_LIMIT_BLOCK_DURATION: Number(process.env.MAX_RATE_LIMIT_BLOCK) || 60 * 60 * 24,
+  },
   REDIS: {
     URL: process.env.REDIS_URL || "redis://localhost:6379",
     HOST: process.env.REDIS_HOST || "localhost",
