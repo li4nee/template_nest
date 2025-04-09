@@ -27,6 +27,7 @@
     "@nestjs/swagger": "^11.1.0",
     "@nestjs/typeorm": "^11.0.0",
     "@types/morgan": "^1.9.9",
+    "@nestjs/cli": "^11.0.0",
     "bcrypt": "^5.1.1",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
@@ -45,7 +46,6 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
-    "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.1",
     "@swc/cli": "^0.6.0",
