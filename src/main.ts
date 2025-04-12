@@ -6,9 +6,11 @@ import { globalSettings } from "./config/settings.config";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 import { HttpExceptionFilter } from "./catch/globalErrorCatcher";
 import { RateLimitMiddleware } from "./middleware/ratelimit.middleware";
-
+import * as cookieParser from 'cookie-parser';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.use(cookieParser()); // use cookie parser middleware
   // Enable global exception filter
   app.useGlobalFilters(new HttpExceptionFilter(new Logger()));
 

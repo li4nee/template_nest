@@ -1,5 +1,7 @@
 import { DataSource, DataSourceOptions } from "typeorm";
 import { globalSettings } from "./settings.config";
+import { User } from "src/entity/user.entity";
+import { Task } from "src/entity/task.entity";
 
 export const AppData: DataSourceOptions = {
   type: "postgres",
@@ -8,8 +10,8 @@ export const AppData: DataSourceOptions = {
   username: globalSettings.DB.USERNAME,
   password: globalSettings.DB.PASSWORD,
   database: globalSettings.DB.DATABASE,
-  entities: ["../entity/*.ts"],
-  synchronize: false,
+  entities: [User,Task],
+  synchronize: true,
   migrations: ["../migrations/*.ts"],
   logging: false,
 };

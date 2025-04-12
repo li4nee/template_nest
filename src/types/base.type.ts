@@ -1,5 +1,5 @@
 import Stream from "stream";
-
+import { Request } from "express";
 export enum ROLES {
   USER = "user",
   ADMIN = "admin",
@@ -48,5 +48,36 @@ export enum EMAIL_TYPE{
   HTML= 'html',
   ATTACHMENT= 'attachment'
 };
+
+export enum TASK_STATUS{
+  PENDING = "pending",
+  PROCESSING = "processing",
+  COMPLETED = "completed",
+  FAILED = "failed",
+  SCHEDULED = "scheduled",
+  CANCELLED = "cancelled",
+}
+
+export enum TASK_TYPE{
+  EMAIL = "email",
+  SMS = "sms",
+  NOTIFICATION = "notification",
+  OTHER = "other",
+}
+
+export enum TASK_PRIORITY{
+  HIGH = 1,
+  MEDIUM = 2,
+  LOW = 3,
+  IMMEDIATE = 0,
+}
+
+export interface AuthorizedRequest extends Request {
+  user:{
+    userId:string,
+    role:ROLES
+  },
+  token: string;
+}
 
 

@@ -40,4 +40,5 @@ export const globalSettings = {
   },
   JWT_SECRET: process.env.JWT_SECRET || "miccheck1212miccheck1212",
   JWT_EXPIRY: process.env.JWT_EXPIRY || "1h",
+  APP_URL: process.env.APP_URL || "http://localhost:4000",
 };

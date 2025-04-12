@@ -48,3 +48,11 @@ export class MailSendError extends CustomError{
     this.name = "MailSendError";
   }
 }
+
+export class TooManyFailedRequestError extends CustomError {
+  constructor(message: string = "Too many failed requests") {
+    super(429, message);
+    this.message = message;
+    this.name = "TooManyFailedRequests";
+  }
+}

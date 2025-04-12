@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+import * as jwt from "jsonwebtoken";
 import { createClient, RedisClientType } from "redis";
 import { globalSettings } from "src/config/settings.config";
 import { Token } from "src/types/base.type";
@@ -14,8 +14,9 @@ import { Injectable } from "@nestjs/common";
 @Injectable()
 export class LoginGlobalStore {
   
-  private login_hash = "login_store";
-  private secret: string =globalSettings.JWT_SECRET || "miccheck1212miccheck1212";
+  login_hash = "login_store"
+  secondary_hash = "secondary_store"
+  private secret: string =globalSettings.JWT_SECRET || "miccheck1212miccheck1212"
   private client : RedisClientType
   constructor(private readonly redisService: RedisService) {
   }
@@ -26,46 +27,38 @@ export class LoginGlobalStore {
 
   private validateToken = (token: string): Token | undefined => {
     try {
-      let validate = jwt.verify(token, this.secret) as Token;
-      return validate;
-    } catch (err) {
+      
+      return jwt.verify(token, this.secret) as Token;
+    } catch(err) {
       return undefined;
     }
   };
-
-  private setToken = async (hash: string, userId: string, token: string) => {
-    let existingToken = await this.client.hGet(hash, userId);
-    let tokens: string[] = existingToken ? JSON.parse(existingToken) : [];
-    tokens.push(token);
-    return await this.client.hSet(hash, userId, JSON.stringify(tokens));
+  
+  private setToken = async (hash: string, userId: string, token: string, expiry?: number) => {
+    const key = `${hash}:${userId}`;
+    await this.client.sAdd(key, token);
+    if (expiry) 
+      await this.client.expire(key, expiry);
   };
-
+  
   private getToken = async (hash: string, userId: string) => {
-    if (!(await this.client.hExists(hash, userId)))
+    const key = `${hash}:${userId}`;
+    const exists = await this.client.exists(key);
+    if (!exists) 
       return { found: false, tokens: [] };
-    let stringifiedToken = await this.client.hGet(hash, userId);
-    let tokens = stringifiedToken ? JSON.parse(stringifiedToken) : [];
+    const tokens = await this.client.sMembers(key); // sab token dincha esle
     return { found: true, tokens };
   };
-
+  
   private removeToken = async (hash: string, userId: string, token: string) => {
-    let stringifiedToken = await this.client.hGet(hash, userId);
-    if (!stringifiedToken) return false;
-    let tokens = stringifiedToken ? JSON.parse(stringifiedToken) : [];
-    if (tokens.length <= 1) {
-      await this.client.hDel(hash, userId);
-      return false;
-    }
-    let index = tokens.indexOf(token);
-    if (tokens.length > 1)
-      await this.client.hSet(
-        hash,
-        userId,
-        JSON.stringify([...tokens.slice(0, index), ...tokens.slice(index + 1)]),
-      );
-    else await this.client.hDel(hash, userId);
-    return true;
+    const key = `${hash}:${userId}`;
+    const removed = await this.client.sRem(key, token);
+    const remaining = await this.client.sCard(key);  // Kati ota remaining tokens cha tesko count dincha esle
+    if (remaining === 0) 
+      await this.client.del(key);
+    return removed === 1;
   };
+  
 
   removeLoginToken = async (userId: string, token: string) => {
     return await this.removeToken(this.login_hash, userId, token);
@@ -84,8 +77,31 @@ export class LoginGlobalStore {
     return verify;
   };
 
-  setLoginToken = (token: string, userId: string) => {
-    this.setToken(this.login_hash, userId, token);
+  setLoginToken = async (token: string, userId: string) => {
+    await this.setToken(this.login_hash, userId, token);
+  };
+
+  removeSecondaryToken = async (userId: string, token: string) => {
+    return await this.removeToken(this.secondary_hash, userId, token);
+  }
+
+  verifySecondaryToken = async (token: string) => {
+    if (!token) throw new PermissionNotGranted("Token not found");
+    let verify = this.validateToken(token) as Token;
+    console.log("verify",verify)
+    if (!verify) 
+      throw new PermissionNotGranted("Invalid token");
+    let { found, tokens } = await this.getToken(
+      this.secondary_hash,
+      verify.user.userId,
+    );
+    if (!found || tokens.indexOf(token) <= -1)
+      throw new PermissionNotGranted("Token expired");
+    return verify;
+  };
+
+  setSecondaryToken = async (token: string, userId: string,expiry:number=60*60) => {
+    await this.setToken(this.secondary_hash, userId, token,expiry);
   };
 }
 

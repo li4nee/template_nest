@@ -70,11 +70,11 @@ export class Logger {
     ────────────────────────────────────────────\n
     [ERROR] ${timestamp} \n
     ──────────────────────────────────────────── \n
-    Status  : ${status}\n
-    URL     : ${method} ${url}\n
-    IP      : ${ip}\n
-    User-Agent : ${userAgent}\n
-    Message : ${message}\n
+    Status:-${status}\n
+    URL:-${method} ${url}\n
+    IP:-${ip}\n
+    User-Agent:-${userAgent}\n
+    Message:-${message}\n
     \n
     Stack Trace:\n
     ${stack}\n
